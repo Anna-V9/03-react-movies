@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import type { FormEvent } from 'react';
 import styles from './SearchBar.module.css';
 import toast from 'react-hot-toast';
-
 
 interface SearchBarProps {
   onSubmit: (query: string) => void;
@@ -11,13 +9,16 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ onSubmit }) => {
   const [query, setQuery] = useState('');
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const trimmed = query.trim();
+  // НОВИЙ спосіб: action отримує FormData автоматично
+  const handleAction = (formData: FormData) => {
+    const value = formData.get('query') as string;
+    const trimmed = value.trim();
+
     if (!trimmed) {
       toast.error('Please enter your search query.');
       return;
     }
+
     onSubmit(trimmed);
   };
 
@@ -32,7 +33,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSubmit }) => {
         >
           Powered by TMDB
         </a>
-        <form className={styles.form} onSubmit={handleSubmit}>
+
+        {/* ВАЖЛИВО: тут тепер action замість onSubmit */}
+        <form className={styles.form} action={handleAction}>
           <input
             className={styles.input}
             type="text"
